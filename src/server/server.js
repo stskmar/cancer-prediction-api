@@ -1,10 +1,14 @@
 require('dotenv').config();
 const express = require('express');
+const multer = require('multer');
 const routes = require('./routes');
-const loadModel = require('../services/loadModel');
-const InputError = require('../exceptions/InputError');
+const loadModel = require('../services/loadModel.js');
+const InputError = require('../exceptions/InputError.js');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+
+// Multer configuration
+const upload = multer(); // Default file upload configuration
 
 (async () => {
   const app = express();
@@ -15,8 +19,8 @@ const bodyParser = require('body-parser');
   app.use(bodyParser.json()); // Parsing JSON request body
   app.use(bodyParser.urlencoded({ extended: true })); // Untuk form-data (multipart)
 
-  // Memasukkan routes ke Express
-  routes(app);
+  // Memasukkan routes ke Express, menggunakan Multer untuk menangani form-data
+  routes(app, upload);
 
   // Error handler
   app.use((err, req, res, next) => {

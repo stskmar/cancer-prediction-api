@@ -1,7 +1,8 @@
-const { postPredictHandler, postPredictHistoriesHandler } = require('./handler');
+const { postPredictHandler, postPredictHistoriesHandler } = require('./handler.js');
 
-const routes = (app) => {
-  app.post('/predict', postPredictHandler);
+const routes = (app, upload) => {
+  // Menggunakan Multer untuk menangani unggahan file gambar
+  app.post('/predict', upload.single('image'), postPredictHandler);
   app.get('/predict/histories', postPredictHistoriesHandler);
 };
 

@@ -1,16 +1,33 @@
 const tf = require('@tensorflow/tfjs-node');
-const InputError = require('../exceptions/InputError');
 
-async function predictClassification(model, image) {
+async function predictClassification(image) {
   try {
+
     const tensor = tf.node
-      .decodeJpeg(image)
+      .decodePng(image)
       .resizeNearestNeighbor([224, 224])
       .expandDims()
-      .toFloat();
+      .toFloat()
 
+    // Pastikan tensor tidak undefined
+    if (!tensor) {
+      throw new Error('Tensor tidak dapat dibuat dari gambar.');
+    }
+
+    // Melakukan prediksi dengan model
     const prediction = model.predict(tensor);
-    const score = await prediction.data();
+
+    // Pastikan hasil prediksi ada
+    if (!prediction) {
+      throw new Error('Prediksi tidak berhasil.');
+    }
+
+    // Menangani data prediksi
+    const score = await prediction.data();  // Mengambil data dari tensor
+    if (score && score.length > 0) {
+      const confidenceScore = Math.max(...score) * 100;  // Mengambil skor tertinggi
+    }
+
     const confidenceScore = Math.max(...score) * 100;
 
     const label = confidenceScore <= 50 ? 'Non-cancer' : 'Cancer';
@@ -18,14 +35,13 @@ async function predictClassification(model, image) {
 
     if (label === 'Cancer') {
       suggestion = "Segera periksa ke dokter!";
-    }
-
-    if (label === 'Non-cancer') {
+    } else {
       suggestion = "Anda sehat!";
     }
 
     return { label, suggestion };
   } catch (error) {
+    console.error('Error in prediction:', error);
     throw new InputError('Terjadi kesalahan dalam melakukan prediksi');
   }
 }
