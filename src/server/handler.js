@@ -1,20 +1,16 @@
-const predictClassification = require('../services/inferenceService');
+const { predictClassification } = require('../services/inferenceService.js');
 const crypto = require('crypto');
 const storeData = require('../services/storeData.js');
 const getAllData = require('../services/getAllData.js');
 
-async function postPredictHandler(req, res) {
-  // Gambar akan berada di req.file.buffer
-  const image = req.file ? req.file.buffer : null;
-
+async function postPredictHandler(req, res, model) {
+  const image = req.file.buffer;
   if (!image) {
     return res.status(400).json({ message: 'No image file uploaded' });
   }
 
-  const { model } = req.app;
-
   try {
-    const { label, suggestion } = await predictClassification(model, image);
+    const { label, suggestion } = await predictClassification(model, image, res);
     const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
@@ -25,7 +21,7 @@ async function postPredictHandler(req, res) {
       createdAt,
     };
 
-    await storeData(id, data);
+    // await storeData(id, data);
 
     res.status(201).json({
       status: 'success',

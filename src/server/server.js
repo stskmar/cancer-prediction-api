@@ -2,25 +2,23 @@ require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const routes = require('./routes.js');
-const loadModel = require('../services/loadModel.js');
+const { loadModel } = require('../services/inferenceService.js');
 const InputError = require('../exceptions/InputError.js');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-// Multer configuration
-const upload = multer(); // Default file upload configuration
+const upload = multer();
 
 (async () => {
   const app = express();
   const model = await loadModel();
-  app.locals.model = model; // Menyimpan model dalam locals app
+  app.locals.model = model;
 
-  app.use(cors()); // Mengizinkan semua domain untuk akses
-  app.use(bodyParser.json()); // Parsing JSON request body
-  app.use(bodyParser.urlencoded({ extended: true })); // Untuk form-data (multipart)
+  app.use(cors());
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
 
-  // Memasukkan routes ke Express, menggunakan Multer untuk menangani form-data
-  routes(app, upload);
+  routes(app, upload, model);
 
   // Error handler
   app.use((err, req, res, next) => {

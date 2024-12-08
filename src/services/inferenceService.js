@@ -1,17 +1,15 @@
 const tf = require('@tensorflow/tfjs-node');
 
-async function predictClassification(req, res) {
-  try {
-    const model = await loadModel(); // Load the model here
-    const imageBuffer = req.file.buffer; // Get the image buffer from the request
+function loadModel() {
+  const modelUrl = "file://model/model.json";
+  return tf.loadGraphModel(modelUrl);
+}
 
-    // Check if the imageBuffer is a valid Buffer object
-    if (!Buffer.isBuffer(imageBuffer)) {
-      throw new Error('Invalid image buffer');
-    }
+async function predictClassification(model, image, res) {
+  try {
 
     const tensor = tf.node
-      .decodePng(imageBuffer)
+      .decodeJpeg(image)
       .resizeNearestNeighbor([224, 224])
       .expandDims()
       .toFloat();
@@ -31,11 +29,11 @@ async function predictClassification(req, res) {
       suggestion = "Anda sehat!";
     }
 
-    res.json({ label, suggestion });
+    return { label, suggestion };
   } catch (error) {
     console.error('Error during prediction:', error);
     res.status(500).json({ message: 'Error during prediction' });
   }
 }
 
-module.exports = predictClassification;
+module.exports = { predictClassification, loadModel };
