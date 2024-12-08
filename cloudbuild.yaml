@@ -1,0 +1,7 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/submissionmlgc-satria-444005/cancer-detection-api', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/submissionmlgc-satria-444005/cancer-detection-api']
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args: ['gcloud', 'run', 'deploy', 'cancer-detection-api', '--image', 'gcr.io/submissionmlgc-satria-444005/cancer-detection-api', '--platform', 'managed', '--region', 'us-central1', '--allow-unauthenticated']
