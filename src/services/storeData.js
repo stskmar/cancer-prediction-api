@@ -9,6 +9,6 @@ async function storeData(id, data) {
        console.error('Error storing data:', error);
        throw new Error('Terjadi kesalahan saat menyimpan data');
    }
-}
+} 
 
 module.exports = storeData;
