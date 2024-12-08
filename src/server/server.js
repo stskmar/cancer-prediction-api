@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
-const routes = require('./routes');
+const routes = require('./routes.js');
 const loadModel = require('../services/loadModel.js');
 const InputError = require('../exceptions/InputError.js');
 const cors = require('cors');
