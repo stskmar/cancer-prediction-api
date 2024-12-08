@@ -1,8 +1,13 @@
 const tf = require('@tensorflow/tfjs-node');
 
 function loadModel() {
-  const modelUrl = "file://model/model.json";
-  return tf.loadGraphModel(modelUrl);
+  const modelUrl = process.env.MODEL_URL;
+  if (modelUrl) {
+    console.log('Model berhasil dimuat');
+    return tf.loadGraphModel(modelUrl);
+  } else {
+    console.error('Model gagal dimuat!');
+  }
 }
 
 async function predictClassification(model, image, res) {

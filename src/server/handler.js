@@ -9,19 +9,21 @@ async function postPredictHandler(req, res, model) {
     return res.status(400).json({ message: 'No image file uploaded' });
   }
 
+  if (image.length > 1000000) {
+    return res.status(413).json({
+      status: 'fail',
+      message: 'Payload content length greater than maximum allowed: 1000000',
+    });
+  }
+
   try {
     const { label, suggestion } = await predictClassification(model, image, res);
     const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
-    const data = {
-      id,
-      result: label,
-      suggestion,
-      createdAt,
-    };
+    const data = { label, suggestion, id, createdAt };
 
-    // await storeData(id, data);
+    await storeData(id, data);
 
     res.status(201).json({
       status: 'success',
@@ -30,14 +32,14 @@ async function postPredictHandler(req, res, model) {
     });
   } catch (error) {
     console.error('Error during prediction:', error);
-    res.status(500).json({
+    return res.status(400).json({
       status: 'fail',
-      message: 'Internal server error',
+      message: 'Terjadi kesalahan dalam melakukan prediksi',
     });
   }
 }
 
-async function postPredictHistoriesHandler(req, res) {
+async function getPredictHistoriesHandler(req, res) {
   const allData = await getAllData();
 
   const formatAllData = allData.docs.map(doc => {
@@ -45,7 +47,7 @@ async function postPredictHistoriesHandler(req, res) {
     return {
       id: doc.id,
       history: {
-        result: data.result,
+        result: data.label,
         createdAt: data.createdAt,
         suggestion: data.suggestion,
         id: doc.id,
@@ -59,4 +61,5 @@ async function postPredictHistoriesHandler(req, res) {
   });
 }
 
-module.exports = { postPredictHandler, postPredictHistoriesHandler };
+
+module.exports = { postPredictHandler, getPredictHistoriesHandler };
