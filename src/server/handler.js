@@ -3,8 +3,10 @@ const crypto = require('crypto');
 const storeData = require('../services/storeData.js');
 const getAllData = require('../services/getAllData.js');
 
-async function postPredictHandler(req, res, model) {
+async function postPredictHandler(req, res) {
   const image = req.file.buffer;
+  const model = req.app.locals.model;
+  
   if (!image) {
     return res.status(400).json({ message: 'No image file uploaded' });
   }
@@ -16,12 +18,18 @@ async function postPredictHandler(req, res, model) {
     });
   }
 
+
   try {
-    const { label, suggestion } = await predictClassification(model, image, res);
+    const { confidenceScore, label, suggestion } = await predictClassification(model, image);
     const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
-    const data = { label, suggestion, id, createdAt };
+    const data = { 
+      id,
+      label: label === 'Cancer' ? 'Cancer' : 'Non-cancer', 
+      suggestion, 
+      createdAt,
+    };
 
     await storeData(id, data);
 

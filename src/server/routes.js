@@ -1,11 +1,17 @@
+const express = require('express');
+const router = express.Router();
+
+const multer = require('multer');
+const upload = multer();
+
 const { postPredictHandler, getPredictHistoriesHandler } = require('./handler.js');
 
-const routes = (app, upload, model) => {
-  app.post('/predict', upload.single('image'), (req, res) => {
-    postPredictHandler(req, res, model);
-  });
-  app.get('/predict/histories', getPredictHistoriesHandler);
-  
-};
+router.post('/predict', upload.single('image'), (req, res) => {
+  postPredictHandler(req, res);
+});
 
-module.exports = routes;
+router.post('/predict/histories', (req, res) => {
+  getPredictHistoriesHandler(req, res);
+});
+
+module.exports = router;
