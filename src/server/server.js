@@ -1,15 +1,16 @@
+require('dotenv').config();
+
 const express = require('express');
-const multer = require('multer');
+const app = express();
+
 const routes = require('./routes.js');
-const { loadModel } = require('../services/inferenceService.js');
+const loadModel = require('../services/loadModel.js');
 const InputError = require('../exceptions/InputError.js');
+
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const upload = multer();
-
 (async () => {
-  const app = express();
   const model = await loadModel();
   app.locals.model = model;
 
@@ -17,7 +18,7 @@ const upload = multer();
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  routes(app, upload, model);
+  app.use('/', routes);
 
   // Error handler
   app.use((err, req, res, next) => {
