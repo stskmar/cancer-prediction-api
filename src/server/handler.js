@@ -20,13 +20,13 @@ async function postPredictHandler(req, res) {
 
 
   try {
-    const { label, suggestion } = await predictClassification(model, image);
+    const { result, suggestion } = await predictClassification(model, image);
     const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
     const data = { 
       id,
-      label, 
+      result, 
       suggestion, 
       createdAt,
     };
