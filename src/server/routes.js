@@ -10,7 +10,7 @@ router.post('/predict', upload.single('image'), (req, res) => {
   postPredictHandler(req, res);
 });
 
-router.post('/predict/histories', (req, res) => {
+router.get('/predict/histories', (req, res) => {
   getPredictHistoriesHandler(req, res);
 });
 
