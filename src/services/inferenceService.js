@@ -8,8 +8,7 @@ async function predictClassification(model, image) {
       .resizeNearestNeighbor([224, 224])
       .expandDims()
       .toFloat();
-      
-    const classes = ['Cancer', 'Non-cancer'];
+    
     const prediction = model.predict(tensor);
     const score = await prediction.data();
     const confidenceScore = Math.max(...score) * 100;
@@ -25,7 +24,11 @@ async function predictClassification(model, image) {
       suggestion = "Anda sehat!";
     }
 
-    return { confidenceScore, label, suggestion };
+    console.log('confidenceScore:', confidenceScore);
+    console.log('label:', label);
+    console.log('suggestion:', suggestion);
+
+    return { label, suggestion };
   } catch (error) {
     console.error('Error during prediction:', error);
     res.status(500).json({ message: 'Error during prediction' });
